@@ -43,6 +43,7 @@ public:
 	double	  length()		{ return sqrt(x*x + y*y); }
 	double	  length2()		{ return x*x + y*y; }
 	double	  normalize()	{ double len = length();	if (!EQUALZERO(len)) { x /= len; y /= len; }	return len; }
+	double normalizeStrict() { double len = length(); if (len != 0.0) { x /= len; y /= len; } return len; }
 	Vector2D& operator=(const Vector2D& v);
 	Vector2D& operator+=(const Vector2D& v);
 	Vector2D& operator-=(const Vector2D& v);
@@ -104,6 +105,7 @@ public:
 	double	  length()		{ return sqrt(x*x + y*y + z*z); }
 	double	  length2()		{ return x*x + y*y + z*z; }
 	double	  normalize()	{ double len = length();	if (!EQUALZERO(len)) { x /= len; y /= len; z /= len; }	return len; }
+	double normalizeStrict() { double len = length(); if (len != 0.0) { x /= len; y /= len; z /= len; } return len; }
 
 	Vector3D& operator=(const Vector3D& v);
 	Vector3D& operator=(const Vector4D& v);
