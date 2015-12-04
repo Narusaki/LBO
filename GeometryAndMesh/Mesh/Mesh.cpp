@@ -5,6 +5,7 @@
 #include "Mesh.h"
 
 #include <map>
+#include <string>
 #include <cassert>
 #include <iomanip>
 
@@ -211,6 +212,8 @@ bool CMesh::Load(const char* sFileName)
 		return loadOBJ(sFileName);
 	if (suffix == ".off" || suffix == ".OFF")
 		return loadOFF(sFileName);
+	if (suffix == ".m" || suffix == ".M")
+		return loadM(sFileName);
 }
 
 bool CMesh::loadOFF(const char* sFileName)
@@ -394,6 +397,136 @@ bool CMesh::loadOBJ(const char* sFileName)
 	origin = 0.5*(vMax + vMin);//ƫ
 
 	return loadFromSMF(VertexList, FaceList, normals);
+}
+
+bool CMesh::loadM(const char* sFileName)
+// -----  format: smf,obj,dat -----
+//vertex:
+//      v x y z,
+//face(triangle):
+//      f v1 v2 v3  (the vertex index is 1-based)
+{
+
+	//open the file
+	ifstream fin;
+	fin.open(sFileName);
+	if (!fin) return false;
+
+	_VECTORLIST VertexList;//临时存储所有点的链表
+	_UINTLIST FaceList;//临时存储所有面包含的点的信息
+	std::vector<Vector3D> normals;
+
+	Vector3D vector;
+	Vector2D vector2d;
+	Vector3D vMin(1e30, 1e30, 1e30);
+	Vector3D vMax(-1e30, -1e30, -1e30);
+	bool bFirst = true;
+
+	maxTex = CTexture(0, 0);
+
+	UINT l[3];
+	char tmpC;
+	short j;
+
+	std::vector<UINT> realIndex;
+	UINT vertexIndex = 0;
+	std::map<pair<unsigned, unsigned>, double> realEdgeLen;
+
+	string buf;
+	while (getline(fin, buf)) //将点和面的信息临时存在VertexList和FaceList中
+	{
+		std::vector<string> parts = splitString(buf, " ");
+		if (parts.size() > 0) //non-empty line
+		{
+			if (parts[0] == "Vertex")
+			{
+				vector.x = atof(parts[2].c_str()); vector.y = atof(parts[3].c_str()); vector.z = atof(parts[4].c_str());
+				VertexList.push_back(vector);
+
+				vertexIndex = atoi(parts[1].c_str());
+				realIndex.resize(vertexIndex, -1);
+				realIndex[vertexIndex - 1] = VertexList.size() - 1;
+
+				if (vector.x<vMin.x)
+					vMin.x = vector.x;
+				if (vector.x>vMax.x)
+					vMax.x = vector.x;
+				if (vector.y<vMin.y)
+					vMin.y = vector.y;
+				if (vector.y>vMax.y)
+					vMax.y = vector.y;
+				if (vector.z<vMin.z)
+					vMin.z = vector.z;
+				if (vector.z>vMax.z)
+					vMax.z = vector.z;
+			}
+			else if (parts[0] == "Face")
+			{
+				for (j = 0; j < 3; j++)
+					l[j] = atoi(parts[j + 2].c_str());
+
+				if (realIndex[l[0] - 1] == realIndex[l[1] - 1] || realIndex[l[1] - 1] == realIndex[l[2] - 1] || realIndex[l[2] - 1] == realIndex[l[0] - 1]) continue;
+				//sin>>tmpC>>l[0]>>l[1]>>l[2];
+				for (j = 0; j < 3; j++) FaceList.push_back(realIndex[l[j] - 1]);
+
+				if (parts.size() <= 5) continue;
+				for (int j = 5; j < parts.size(); ++j)
+				{
+					if (parts[j].find("length") != string::npos)
+					{
+						double len0, len1, len2;
+						len0 = atof(parts[j].substr(parts[j].find("(") + 1, parts[j].length() - parts[j].find("(") - 1).c_str());
+						len1 = atof(parts[j + 1].c_str());
+						len2 = atof(parts[j + 2].substr(0, parts[j + 2].find(")")).c_str());
+						realEdgeLen[make_pair(realIndex[l[0] - 1], realIndex[l[1] - 1])] = len0;
+						realEdgeLen[make_pair(realIndex[l[1] - 1], realIndex[l[2] - 1])] = len1;
+						realEdgeLen[make_pair(realIndex[l[2] - 1], realIndex[l[0] - 1])] = len2;
+					}
+				}
+			}
+		}
+	}
+	fin.close();
+	//根据包围盒将物体中心移至原点，同时进行归一化
+	vector = vMax - vMin;
+	double d = __max(vector.x, vector.y);
+	d = 0.5*__max(d, vector.z);
+	vector = 0.5*(vMax + vMin);//偏移量
+	scaleD = d;
+	origin = vector;
+
+	loadFromSMF(VertexList, FaceList, normals);
+
+	if (realEdgeLen.empty()) return true;
+
+	for (unsigned i = 0; i < m_nEdge; ++i)
+	{
+		unsigned v0 = m_pEdge[i].m_iVertex[0];
+		unsigned v1 = m_pEdge[i].m_iVertex[1];
+
+		m_pEdge[i].m_length = realEdgeLen[make_pair(v0, v1)];
+	}
+
+	// check edge length
+	for (unsigned i = 0; i < m_nEdge; ++i)
+	{
+		if (i > m_pEdge[i].m_iTwinEdge) continue;
+		if (m_pEdge[i].m_iTwinEdge == -1) continue;
+		assert(m_pEdge[i].m_length == m_pEdge[m_pEdge[i].m_iTwinEdge].m_length);
+	}
+
+	// re-calculate areas
+	for (unsigned i = 0; i < m_nFace; ++i)
+	{
+		double a = m_pEdge[m_pFace[i].m_piEdge[0]].m_length;
+		double b = m_pEdge[m_pFace[i].m_piEdge[1]].m_length;
+		double c = m_pEdge[m_pFace[i].m_piEdge[2]].m_length;
+
+		double p = (a + b + c) / 2.0;
+
+		m_pFace[i].m_dArea = sqrt(fabs(p * (p - a) * (p - b) * (p - c)));
+	}
+	return true;
 }
 
 bool CMesh::loadFromSMF(std::list<Vector3D> &VertexList, std::list<UINT> &FaceList, std::vector<Vector3D> &normals)
@@ -1572,3 +1705,19 @@ void CMesh::calVertexNormal(UINT i)
 
 }
 
+vector<string> CMesh::splitString(string s, string sep)
+{
+	vector<string> res;
+	if (s.size() == 0) return res;
+	size_t pos = s.find(sep);
+
+	while (pos != string::npos)
+	{
+		if (s.size() == 0) break;
+		res.push_back(s.substr(0, pos));
+		s = s.substr(pos + sep.size(), s.length() - pos - sep.size());
+		pos = s.find(sep);
+	}
+	if (s.size() != 0) res.push_back(s);
+	return res;
+}

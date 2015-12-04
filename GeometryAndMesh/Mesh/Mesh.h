@@ -194,6 +194,7 @@ private:
 	bool	reConstruct();// construct connectivity from current mesh
 	bool	loadOBJ(const char* sFileName);
 	bool	loadOFF(const char* sFileName);
+	bool	loadM(const char* sFileName);
 	bool	loadFromSMF(std::list<Vector3D> &VertexList, 
 		std::list<UINT> &FaceList, 
 		std::vector<Vector3D> &normals);
@@ -207,6 +208,8 @@ private:
 	void	expandCapacity();
 	//ÿΧĽǶ
 	void calcVertexAngle();
+
+	std::vector<std::string> splitString(std::string s, std::string sep);
 };
 
 #endif //MESH_H
