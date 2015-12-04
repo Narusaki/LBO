@@ -11,12 +11,13 @@ using namespace std;
 // see HeatMethod.h for the class definition
 HEATMETHOD_API HeatMethod::HeatMethod()
 {
+	lbo = NULL;
 	return;
 }
 
 HEATMETHOD_API HeatMethod::~HeatMethod()
 {
-
+	if (lbo) delete lbo;
 }
 
 HEATMETHOD_API void HeatMethod::AssignMesh(CMesh *mesh_)
