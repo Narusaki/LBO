@@ -3,6 +3,13 @@ Discrete Laplace Beltrami Operator (LBO) and related applications.
 
 ## Applications:
 
+### Mean Curvature
+A direct application of discrete LBO is calculate the mean curvature vector of a surface by simply multipling the Laplacian matrix on the point itself. Following is an example:
+<div align="center">
+<img src="figures/curvature_value_crop.png" width="200" align="center"/>
+<img src="figures/curvature_vector_crop.png" width="200" align="center"/>
+</div>
+
 ### Disk Harmonic Map
 Disk Harmonic Map maps a surface homeomorphic to the planar unit disk. It is a popular parameterization method. An example of disk harmonic map on a nefertiti model is shown below:
 <div align="center">
