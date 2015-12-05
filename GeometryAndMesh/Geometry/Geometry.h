@@ -40,8 +40,8 @@ public:
 
 
 	// operator
-	double	  length()		{ return sqrt(x*x + y*y); }
-	double	  length2()		{ return x*x + y*y; }
+	double	  length() const		{ return sqrt(x*x + y*y); }
+	double	  length2() const		{ return x*x + y*y; }
 	double	  normalize()	{ double len = length();	if (!EQUALZERO(len)) { x /= len; y /= len; }	return len; }
 	double normalizeStrict() { double len = length(); if (len != 0.0) { x /= len; y /= len; } return len; }
 	Vector2D& operator=(const Vector2D& v);
@@ -102,8 +102,8 @@ public:
 	Vector3D(const Vector4D& v);
 
 	// operator
-	double	  length()		{ return sqrt(x*x + y*y + z*z); }
-	double	  length2()		{ return x*x + y*y + z*z; }
+	double	  length() const		{ return sqrt(x*x + y*y + z*z); }
+	double	  length2() const		{ return x*x + y*y + z*z; }
 	double	  normalize()	{ double len = length();	if (!EQUALZERO(len)) { x /= len; y /= len; z /= len; }	return len; }
 	double normalizeStrict() { double len = length(); if (len != 0.0) { x /= len; y /= len; z /= len; } return len; }
 
@@ -143,7 +143,7 @@ public:
 	GEOMETRY_API friend Vector3D operator/(const Vector3D& lv, const double u);
 	GEOMETRY_API friend double   operator*(const Vector3D& lv, const Vector3D& rv);
 	GEOMETRY_API friend Vector3D operator^(const Vector3D& lv, const Vector3D& rv);
-	GEOMETRY_API friend std::ostream& operator<< (std::ostream &output, Vector3D& v);
+	GEOMETRY_API friend std::ostream& operator<< (std::ostream &output, const Vector3D& v);
 
 };
 

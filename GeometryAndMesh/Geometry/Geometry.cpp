@@ -272,7 +272,7 @@ GEOMETRY_API Vector3D operator^(const Vector3D& lv, const Vector3D& rv)
 	return rel;
 }
 
-GEOMETRY_API std::ostream& operator<< (std::ostream &output, Vector3D& v)
+GEOMETRY_API std::ostream& operator<< (std::ostream &output, const Vector3D& v)
 {
 	output << v.x << " " << v.y << " " << v.z;
 	return output;
