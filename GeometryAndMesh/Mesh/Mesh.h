@@ -187,6 +187,8 @@ public:
 
 	void collapse(unsigned iEdge, Vector3D newPos);
 
+	void add(Vector3D pos, unsigned iFace);
+
 	//бߵı߳CEdge->m_length
 	void	calcAllEdgeLength();
 private:

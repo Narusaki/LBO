@@ -1330,44 +1330,29 @@ void CMesh::flip(unsigned iEdge)
 	m_pFace[f1].m_piEdge[topI] = e0; m_pFace[f1].m_piEdge[(topI + 1) % 3] = twinEdge; m_pFace[f1].m_piEdge[(topI + 2) % 3] = e3;
 
 	// expand v0, v1
-	unsigned *v0mpiEdge = new unsigned[m_pVertex[v0].m_nValence + 1];
+	unsigned *v0mpiEdge = new unsigned[m_pVertex[v0].m_nValence+1];
 	unsigned eIndex = 0;
 	for (unsigned i = 0; i < m_pVertex[v0].m_nValence; ++i)
 	{
+		if (m_pVertex[v0].m_piEdge[i] == e1)
+			v0mpiEdge[eIndex++] = twinEdge;
 		v0mpiEdge[eIndex++] = m_pVertex[v0].m_piEdge[i];
-		unsigned nextEdge = m_pVertex[v0].m_piEdge[(i + 1) % m_pVertex[v0].m_nValence];
-		if (nextEdge != e1) continue;
-		v0mpiEdge[eIndex++] = twinEdge;
 	}
-	assert(eIndex == m_pVertex[v0].m_nValence + 1 || m_pVertex[v0].m_bIsBoundary && eIndex == m_pVertex[v0].m_nValence);
-	// if e1 is v0's first edge
-	if (m_pVertex[v0].m_bIsBoundary && eIndex == m_pVertex[v0].m_nValence)
-	{
-		for (unsigned i = 0; i < m_pVertex[v0].m_nValence; ++i)
-			v0mpiEdge[m_pVertex[v0].m_nValence - i] = v0mpiEdge[m_pVertex[v0].m_nValence - i - 1];
-		v0mpiEdge[0] = twinEdge;
-	}
+	assert(eIndex == m_pVertex[v0].m_nValence+1);
+
 	delete[] m_pVertex[v0].m_piEdge;
 	m_pVertex[v0].m_piEdge = v0mpiEdge;
 	++m_pVertex[v0].m_nValence;
 
-	unsigned *v1mpiEdge = new unsigned[m_pVertex[v1].m_nValence + 1];
+	unsigned *v1mpiEdge = new unsigned[m_pVertex[v1].m_nValence+1];
 	eIndex = 0;
 	for (unsigned i = 0; i < m_pVertex[v1].m_nValence; ++i)
 	{
+		if (m_pVertex[v1].m_piEdge[i] == e3)
+			v1mpiEdge[eIndex++] = iEdge;
 		v1mpiEdge[eIndex++] = m_pVertex[v1].m_piEdge[i];
-		unsigned nextEdge = m_pVertex[v1].m_piEdge[(i + 1) % m_pVertex[v1].m_nValence];
-		if (nextEdge != e3) continue;
-		v1mpiEdge[eIndex++] = iEdge;
 	}
-	assert(eIndex == m_pVertex[v1].m_nValence + 1 || m_pVertex[v1].m_bIsBoundary && eIndex == m_pVertex[v1].m_nValence);
-	// if e3 is v1's first edge
-	if (m_pVertex[v1].m_bIsBoundary && eIndex == m_pVertex[v1].m_nValence)
-	{
-		for (unsigned i = 0; i < m_pVertex[v1].m_nValence; ++i)
-			v0mpiEdge[m_pVertex[v1].m_nValence - i] = v0mpiEdge[m_pVertex[v1].m_nValence - i - 1];
-		v1mpiEdge[0] = iEdge;
-	}
+	assert(eIndex == m_pVertex[v1].m_nValence+1);
 	delete[] m_pVertex[v1].m_piEdge;
 	m_pVertex[v1].m_piEdge = v1mpiEdge;
 	++m_pVertex[v1].m_nValence;
@@ -1457,14 +1442,14 @@ void CMesh::collapse(unsigned iEdge, Vector3D newPos)
 				if (m_pEdge[curEdge].m_iVertex[0] == v1)
 				{
 					m_pEdge[curEdge].m_iVertex[0] = v0;
-					// 					m_pEdge[curEdge].m_length = 
-					// 						(m_pVertex[m_pEdge[curEdge].m_iVertex[0]].m_vPosition - m_pVertex[m_pEdge[curEdge].m_iVertex[1]].m_vPosition).length();
+					m_pEdge[curEdge].m_length = 
+						(m_pVertex[m_pEdge[curEdge].m_iVertex[0]].m_vPosition - m_pVertex[m_pEdge[curEdge].m_iVertex[1]].m_vPosition).length();
 				}
 				if (m_pEdge[curEdge].m_iVertex[1] == v1)
 				{
 					m_pEdge[curEdge].m_iVertex[1] = v0;
-					// 					m_pEdge[curEdge].m_length = 
-					// 						(m_pVertex[m_pEdge[curEdge].m_iVertex[0]].m_vPosition - m_pVertex[m_pEdge[curEdge].m_iVertex[1]].m_vPosition).length();
+					m_pEdge[curEdge].m_length = 
+						(m_pVertex[m_pEdge[curEdge].m_iVertex[0]].m_vPosition - m_pVertex[m_pEdge[curEdge].m_iVertex[1]].m_vPosition).length();
 				}
 			}
 			v0AdjFaces.insert(f0I, *f1J);
@@ -1498,14 +1483,14 @@ void CMesh::collapse(unsigned iEdge, Vector3D newPos)
 				if (m_pEdge[curEdge].m_iVertex[0] == v1)
 				{
 					m_pEdge[curEdge].m_iVertex[0] = v0;
-					// 					m_pEdge[curEdge].m_length = 
-					// 						(m_pVertex[m_pEdge[curEdge].m_iVertex[0]].m_vPosition - m_pVertex[m_pEdge[curEdge].m_iVertex[1]].m_vPosition).length();
+					m_pEdge[curEdge].m_length = 
+						(m_pVertex[m_pEdge[curEdge].m_iVertex[0]].m_vPosition - m_pVertex[m_pEdge[curEdge].m_iVertex[1]].m_vPosition).length();
 				}
 				if (m_pEdge[curEdge].m_iVertex[1] == v1)
 				{
 					m_pEdge[curEdge].m_iVertex[1] = v0;
-					// 					m_pEdge[curEdge].m_length = 
-					// 						(m_pVertex[m_pEdge[curEdge].m_iVertex[0]].m_vPosition - m_pVertex[m_pEdge[curEdge].m_iVertex[1]].m_vPosition).length();
+					m_pEdge[curEdge].m_length = 
+						(m_pVertex[m_pEdge[curEdge].m_iVertex[0]].m_vPosition - m_pVertex[m_pEdge[curEdge].m_iVertex[1]].m_vPosition).length();
 				}
 			}
 			v0AdjFaces.insert(f0I, *f1I);
@@ -1656,6 +1641,129 @@ void CMesh::collapse(unsigned iEdge, Vector3D newPos)
 	else --m_nValidFaceNum;
 	if (twinEdge != -1) m_nValidEdgeNum -= 6;
 	else m_nValidEdgeNum -= 3;
+}
+
+void CMesh::add(Vector3D pos, unsigned iFace)
+{
+	// add a point into the interior of face iFace
+	unsigned v0 = m_pFace[iFace].m_piVertex[0];
+	unsigned v1 = m_pFace[iFace].m_piVertex[1];
+	unsigned v2 = m_pFace[iFace].m_piVertex[2];
+	unsigned e0 = m_pFace[iFace].m_piEdge[0];
+	unsigned e1 = m_pFace[iFace].m_piEdge[1];
+	unsigned e2 = m_pFace[iFace].m_piEdge[2];
+	unsigned f0 = iFace;
+
+	unsigned v3 = m_nVertex++;
+	unsigned e3 = m_nEdge++;
+	unsigned e4 = m_nEdge++;
+	unsigned e5 = m_nEdge++;
+	unsigned e6 = m_nEdge++;
+	unsigned e7 = m_nEdge++;
+	unsigned e8 = m_nEdge++;
+	unsigned f1 = m_nFace++;
+	unsigned f2 = m_nFace++;
+
+	// set the new added vertex
+	m_pVertex[v3].m_vPosition = pos;
+	m_pVertex[v3].m_nValence = 3;
+	m_pVertex[v3].m_piEdge = new UINT[3];
+	m_pVertex[v3].m_piEdge[0] = e3;
+	m_pVertex[v3].m_piEdge[1] = e4;
+	m_pVertex[v3].m_piEdge[2] = e5;
+	m_pVertex[v3].m_bIsBoundary = false;
+	m_pAngles[v3] = 2 * PI;
+
+	// set all 6 new added edges
+	m_pEdge[e3].m_iVertex[0] = v3;
+	m_pEdge[e3].m_iVertex[1] = v0;
+	m_pEdge[e3].m_iTwinEdge = e6;
+	m_pEdge[e3].m_iNextEdge = e0;
+	m_pEdge[e3].m_iFace = f0;
+	m_pEdge[e3].m_length = (m_pVertex[v3].m_vPosition - m_pVertex[v0].m_vPosition).length();
+	m_pEdge[e3].m_bValid = true;
+
+	m_pEdge[e4].m_iVertex[0] = v3;
+	m_pEdge[e4].m_iVertex[1] = v1;
+	m_pEdge[e4].m_iTwinEdge = e7;
+	m_pEdge[e4].m_iNextEdge = e1;
+	m_pEdge[e4].m_iFace = f1;
+	m_pEdge[e4].m_length = (m_pVertex[v3].m_vPosition - m_pVertex[v1].m_vPosition).length();
+	m_pEdge[e4].m_bValid = true;
+
+	m_pEdge[e5].m_iVertex[0] = v3;
+	m_pEdge[e5].m_iVertex[1] = v2;
+	m_pEdge[e5].m_iTwinEdge = e8;
+	m_pEdge[e5].m_iNextEdge = e2;
+	m_pEdge[e5].m_iFace = f2;
+	m_pEdge[e5].m_length = (m_pVertex[v3].m_vPosition - m_pVertex[v2].m_vPosition).length();
+	m_pEdge[e5].m_bValid = true;
+
+	m_pEdge[e6].m_iVertex[0] = v0;
+	m_pEdge[e6].m_iVertex[1] = v3;
+	m_pEdge[e6].m_iTwinEdge = e3;
+	m_pEdge[e6].m_iNextEdge = e5;
+	m_pEdge[e6].m_iFace = f2;
+	m_pEdge[e6].m_length = (m_pVertex[v3].m_vPosition - m_pVertex[v0].m_vPosition).length();
+	m_pEdge[e6].m_bValid = true;
+
+	m_pEdge[e7].m_iVertex[0] = v1;
+	m_pEdge[e7].m_iVertex[1] = v3;
+	m_pEdge[e7].m_iTwinEdge = e4;
+	m_pEdge[e7].m_iNextEdge = e3;
+	m_pEdge[e7].m_iFace = f0;
+	m_pEdge[e7].m_length = (m_pVertex[v3].m_vPosition - m_pVertex[v1].m_vPosition).length();
+	m_pEdge[e7].m_bValid = true;
+
+	m_pEdge[e8].m_iVertex[0] = v2;
+	m_pEdge[e8].m_iVertex[1] = v3;
+	m_pEdge[e8].m_iTwinEdge = e5;
+	m_pEdge[e8].m_iNextEdge = e4;
+	m_pEdge[e8].m_iFace = f1;
+	m_pEdge[e8].m_length = (m_pVertex[v3].m_vPosition - m_pVertex[v2].m_vPosition).length();
+	m_pEdge[e8].m_bValid = true;
+
+	// set faces
+	m_pFace[f0].m_piVertex[2] = v3;
+	m_pFace[f0].m_piEdge[1] = e7;
+	m_pFace[f0].m_piEdge[2] = e3;
+	m_pFace[f0].m_bValid = true;
+
+	m_pFace[f1].Create(3);
+	m_pFace[f1].m_piVertex[0] = v1;
+	m_pFace[f1].m_piVertex[1] = v2;
+	m_pFace[f1].m_piVertex[2] = v3;
+	m_pFace[f1].m_piEdge[0] = e1;
+	m_pFace[f1].m_piEdge[1] = e8;
+	m_pFace[f1].m_piEdge[2] = e4;
+	m_pFace[f1].m_bValid = true;
+
+	m_pFace[f2].Create(3);
+	m_pFace[f2].m_piVertex[0] = v2;
+	m_pFace[f2].m_piVertex[1] = v0;
+	m_pFace[f2].m_piVertex[2] = v3;
+	m_pFace[f2].m_piEdge[0] = e2;
+	m_pFace[f2].m_piEdge[1] = e6;
+	m_pFace[f2].m_piEdge[2] = e5;
+	m_pFace[f2].m_bValid = true;
+
+	for (int j = f0; j <= f2; ++j)
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			double l0 = m_pEdge[m_pFace[j].m_piEdge[i]].m_length;
+			double l1 = m_pEdge[m_pFace[j].m_piEdge[(i + 2) % 3]].m_length;
+			double l2 = m_pEdge[m_pFace[j].m_piEdge[(i + 1) % 3]].m_length;
+			double angle = (l0*l0 + l1*l1 - l2*l2) / (2.0*l0*l1);
+			if (angle > 1.0) angle = 1.0; if (angle < -1.0) angle = -1.0;
+			m_pFace[j].m_pdAngle[i] = acos(angle);
+		}
+	}
+
+	calFaceNormal(f0); calFaceNormal(f1); calFaceNormal(f2);
+	calVertexNormal(v3);
+
+	expandCapacity();
 }
 
 void CMesh::calFaceNormal(UINT i)
