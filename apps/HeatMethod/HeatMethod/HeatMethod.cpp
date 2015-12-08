@@ -12,12 +12,18 @@ using namespace std;
 HEATMETHOD_API HeatMethod::HeatMethod()
 {
 	lbo = NULL;
+	outputInfo = true;
 	return;
 }
 
 HEATMETHOD_API HeatMethod::~HeatMethod()
 {
 	if (lbo) delete lbo;
+}
+
+HEATMETHOD_API void HeatMethod::SetOutputInfo(bool outputInfo_) 
+{ 
+	outputInfo = outputInfo_; 
 }
 
 HEATMETHOD_API void HeatMethod::AssignMesh(CMesh *mesh_)
@@ -45,12 +51,14 @@ HEATMETHOD_API void HeatMethod::PreFactor()
 	clock_t start = clock();
 	chol1.compute(lbo->AMatrix() - t * lbo->LMatrix());
 	clock_t end = clock();
-	cout << "Cholesky Decomposition Time: " << (double)(end - start) / (double)CLOCKS_PER_SEC << endl;
+	if (outputInfo)
+		cout << "Cholesky Decomposition Time: " << (double)(end - start) / (double)CLOCKS_PER_SEC << endl;
 
 	start = clock();
 	chol2.compute(lbo->LMatrix());
 	end = clock();
-	cout << "Cholesky Decomposition Time: " << (double)(end - start) / (double)CLOCKS_PER_SEC << endl;
+	if (outputInfo)
+		cout << "Cholesky Decomposition Time: " << (double)(end - start) / (double)CLOCKS_PER_SEC << endl;
 }
 
 HEATMETHOD_API void HeatMethod::AssignSources(const std::list<unsigned int> &sources_)
@@ -64,7 +72,8 @@ HEATMETHOD_API void HeatMethod::BuildDistanceField()
 	clock_t start = clock();
 	Eigen::VectorXd u = chol1.solve(delta);
 	clock_t end = clock();
-	cout << "Solving Time: " << (double)(end - start) / (double)CLOCKS_PER_SEC << endl;
+	if (outputInfo)
+		cout << "Solving Time: " << (double)(end - start) / (double)CLOCKS_PER_SEC << endl;
 
 	//Calculate X
 	for (unsigned i = 0; i < mesh->m_nFace; ++i)
@@ -126,7 +135,8 @@ HEATMETHOD_API void HeatMethod::BuildDistanceField()
 	start = clock();
 	phi = chol2.solve(GX);
 	end = clock();
-	cout << "Solving Time: " << (double)(end - start) / (double)CLOCKS_PER_SEC << endl;
+	if (outputInfo)
+		cout << "Solving Time: " << (double)(end - start) / (double)CLOCKS_PER_SEC << endl;
 
 	double srcDist = phi[sources.front()];
 	for (unsigned i = 0; i < mesh->m_nVertex; ++i)

@@ -21,6 +21,7 @@ public:
 	HeatMethod();
 	~HeatMethod();
 
+	void SetOutputInfo(bool outputInfo_);
 	void AssignMesh(CMesh *mesh_);
 	void AssignStep(double step_);
 	void PreFactor();
@@ -45,4 +46,5 @@ private:
 	Eigen::VectorXd GX;
 	Eigen::VectorXd delta;
 
+	bool outputInfo;
 };

@@ -43,6 +43,7 @@ int main(int argc, char **argv)
 	HeatMethod heatMethod;
 	heatMethod.AssignMesh(mesh);
 	heatMethod.AssignStep(step);
+	heatMethod.SetOutputInfo(true);
 	heatMethod.PreFactor();
 
 	for (int i = 0; i < sourcesSet.size(); ++i)
