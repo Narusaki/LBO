@@ -1017,17 +1017,9 @@ UINT CMesh::split(UINT iEdge, double pos){	//split at the middle of the edge
 		unsigned newEdgeListIndex = 0;
 		UINT* v1piEdge = new UINT[m_pVertex[v1].m_nValence];
 		for (short i = 0; i < m_pVertex[v1].m_nValence - 1; ++i) {
-			v1piEdge[newEdgeListIndex] = m_pVertex[v1].m_piEdge[i];
-			if (m_pEdge[m_pVertex[v1].m_piEdge[(i + 1) % (m_pVertex[v1].m_nValence - 1)]].m_iFace == f1) {
-				++newEdgeListIndex; v1piEdge[newEdgeListIndex] = e10;
-			}
-			++newEdgeListIndex;
-		}
-		if (m_pVertex[v1].m_bIsBoundary && newEdgeListIndex == m_pVertex[v1].m_nValence - 1)
-		{
-			for (unsigned i = 0; i < m_pVertex[v1].m_nValence; ++i)
-				v1piEdge[m_pVertex[v1].m_nValence - i] = v1piEdge[m_pVertex[v1].m_nValence - i - 1];
-			v1piEdge[0] = e10;
+			if (m_pVertex[v1].m_piEdge[i] == e1)
+				v1piEdge[newEdgeListIndex++] = e10;
+			v1piEdge[newEdgeListIndex++] = m_pVertex[v1].m_piEdge[i];
 		}
 		delete[] m_pVertex[v1].m_piEdge;
 		m_pVertex[v1].m_piEdge = v1piEdge;
@@ -1126,21 +1118,14 @@ UINT CMesh::split(UINT iEdge, double pos){	//split at the middle of the edge
 		//No Changes on v2 and v4
 
 		//Changes on v1
+		//Changes on v1
 		m_pVertex[v1].m_nValence++;
 		unsigned newEdgeListIndex = 0;
 		UINT* v1piEdge = new UINT[m_pVertex[v1].m_nValence];
 		for (short i = 0; i < m_pVertex[v1].m_nValence - 1; ++i) {
-			v1piEdge[newEdgeListIndex] = m_pVertex[v1].m_piEdge[i];
-			if (m_pEdge[m_pVertex[v1].m_piEdge[(i + 1) % (m_pVertex[v1].m_nValence - 1)]].m_iFace == f1) {
-				++newEdgeListIndex; v1piEdge[newEdgeListIndex] = e10;
-			}
-			++newEdgeListIndex;
-		}
-		if (m_pVertex[v1].m_bIsBoundary && newEdgeListIndex == m_pVertex[v1].m_nValence - 1)
-		{
-			for (unsigned i = 0; i < m_pVertex[v1].m_nValence; ++i)
-				v1piEdge[m_pVertex[v1].m_nValence - i] = v1piEdge[m_pVertex[v1].m_nValence - i - 1];
-			v1piEdge[0] = e10;
+			if (m_pVertex[v1].m_piEdge[i] == e1)
+				v1piEdge[newEdgeListIndex++] = e10;
+			v1piEdge[newEdgeListIndex++] = m_pVertex[v1].m_piEdge[i];
 		}
 		delete[] m_pVertex[v1].m_piEdge;
 		m_pVertex[v1].m_piEdge = v1piEdge;
@@ -1150,17 +1135,9 @@ UINT CMesh::split(UINT iEdge, double pos){	//split at the middle of the edge
 		newEdgeListIndex = 0;
 		UINT* v3piEdge = new UINT[m_pVertex[v3].m_nValence];
 		for (short i = 0; i < m_pVertex[v3].m_nValence - 1; ++i) {
-			v3piEdge[newEdgeListIndex] = m_pVertex[v3].m_piEdge[i];
-			if (m_pEdge[m_pVertex[v3].m_piEdge[(i + 1) % (m_pVertex[v3].m_nValence - 1)]].m_iFace == f2) {
-				++newEdgeListIndex; v3piEdge[newEdgeListIndex] = e11;
-			}
-			++newEdgeListIndex;
-		}
-		if (m_pVertex[v3].m_bIsBoundary && newEdgeListIndex == m_pVertex[v3].m_nValence - 1)
-		{
-			for (unsigned i = 0; i < m_pVertex[v3].m_nValence; ++i)
-				v3piEdge[m_pVertex[v3].m_nValence - i] = v1piEdge[m_pVertex[v3].m_nValence - i - 1];
-			v3piEdge[0] = e11;
+			if (m_pVertex[v3].m_piEdge[i] == e5)
+				v3piEdge[newEdgeListIndex++] = e11;
+			v3piEdge[newEdgeListIndex++] = m_pVertex[v3].m_piEdge[i];
 		}
 		delete[] m_pVertex[v3].m_piEdge;
 		m_pVertex[v3].m_piEdge = v3piEdge;
